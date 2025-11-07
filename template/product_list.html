@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Products{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1> Product Management</h1>
+    <a href="{% url 'add_product' %}" class="btn btn-primary"> Add New Product</a>
+</div>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>SKU</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>
+                    <img src="{{ product.image.url|default:'/static/placeholder.png' }}" 
+                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">
+                </td>
+                <td><strong>{{ product.name }}</strong></td>
+                <td>{{ product.sku }}</td>
+                <td>{{ product.category.name|default:"N/A" }}</td>
+                <td>₦{{ product.price|floatformat:2 }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>
+                    {% if product.is_low_stock %}
+                    <span class="badge badge-danger">Low Stock</span>
+                    {% else %}
+                    <span class="badge badge-success">In Stock</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'edit_product' product.id %}" class="btn btn-primary" style="padding: 0.4rem 0.8rem;">
+                         Edit
+                    </a>
+                    <a href="{% url 'delete_product' product.id %}" class="btn btn-danger" style="padding: 0.4rem 0.8rem;">
+                         Delete
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 2rem;">No products found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

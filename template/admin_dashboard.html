@@ -1,0 +1,162 @@
+ {% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card h3 {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-card .value {
+        font-size: 2rem;
+        font-weight: bold;
+    }
+    
+    .stat-card.green {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+    
+    .stat-card.orange {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .stat-card.red {
+        background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+</style>
+
+<h1 style="margin-bottom: 2rem;"> Admin Dashboard</h1>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total Products</h3>
+        <div class="value">{{ total_products }}</div>
+    </div>
+    
+    <div class="stat-card green">
+        <h3>Total Sales</h3>
+        <div class="value">{{ total_sales }}</div>
+    </div>
+    
+    <div class="stat-card orange">
+        <h3>Low Stock Items</h3>
+        <div class="value">{{ low_stock_products }}</div>
+    </div>
+    
+    <div class="stat-card red">
+        <h3>Debtors</h3>
+        <div class="value">{{ debtors_count }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2> Total Revenue</h2>
+    </div>
+    <div style="font-size: 2.5rem; font-weight: bold; color: #667eea;">
+        ₦{{ total_revenue|floatformat:2 }}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2> Recent Sales</h2>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Invoice</th>
+                <th>Customer</th>
+                <th>Staff</th>
+                <th>Total</th>
+                <th>Payment Status</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in recent_sales %}
+            <tr>
+                <td><strong>{{ sale.invoice_number }}</strong></td>
+                <td>{{ sale.customer_name|default:"Walk-in" }}</td>
+                <td>{{ sale.staff.first_name }} {{ sale.staff.last_name }}</td>
+                <td>₦{{ sale.total|floatformat:2 }}</td>
+                <td>
+                    {% if sale.payment_status == 'paid' %}
+                    <span class="badge badge-success">Paid</span>
+                    {% elif sale.payment_status == 'partial' %}
+                    <span class="badge badge-warning">Partial</span>
+                    {% else %}
+                    <span class="badge badge-danger">Unpaid</span>
+                    {% endif %}
+                </td>
+                <td>{{ sale.created_at|date:"M d, Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'view_receipt' sale.id %}" class="btn btn-primary" style="padding: 0.4rem 0.8rem;">
+                        View
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 2rem;">No sales yet</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2> Low Stock Alert</h2>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Current Stock</th>
+                <th>Reorder Level</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in low_stock %}
+            <tr>
+                <td><strong>{{ product.name }}</strong></td>
+                <td>{{ product.sku }}</td>
+                <td><span class="badge badge-danger">{{ product.quantity }}</span></td>
+                <td>{{ product.reorder_level }}</td>
+                <td>
+                    <a href="{% url 'edit_product' product.id %}" class="btn btn-warning" style="padding: 0.4rem 0.8rem;">
+                        Restock
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 2rem;">All products are well stocked! </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

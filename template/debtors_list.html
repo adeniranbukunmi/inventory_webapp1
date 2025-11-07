@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Debtors{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;"> Debtors & Payment Records</h1>
+
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Invoice</th>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Total Amount</th>
+                <th>Paid</th>
+                <th>Balance</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sale in debtors %}
+            <tr>
+                <td><strong>{{ sale.invoice_number }}</strong></td>
+                <td>{{ sale.customer_name|default:"Walk-in" }}</td>
+                <td>{{ sale.customer_phone|default:"-" }}</td>
+                <td>₦{{ sale.total|floatformat:2 }}</td>
+                <td>₦{{ sale.amount_paid|floatformat:2 }}</td>
+                <td><strong style="color: #dc3545;">₦{{ sale.balance|floatformat:2 }}</strong></td>
+                <td>{{ sale.created_at|date:"M d, Y" }}</td>
+                <td>
+                    <a href="{% url 'record_payment' sale.id %}" class="btn btn-success" style="padding: 0.4rem 0.8rem;">
+                         Record Payment
+                    </a>
+                    <a href="{% url 'view_receipt' sale.id %}" class="btn btn-primary" style="padding: 0.4rem 0.8rem;">
+                        📄 View
+                    </a>
+                </td>
+            </tr>
+            
+            {% if sale.payments.all %}
+            <tr style="background: #f8f9fa;">
+                <td colspan="8" style="padding-left: 3rem;">
+                    <strong>Payment History:</strong><br>
+                    {% for payment in sale.payments.all %}
+                    <small>
+                        {{ payment.created_at|date:"M d, Y H:i" }} - 
+                        ₦{{ payment.amount|floatformat:2 }} 
+                        ({{ payment.payment_method|title }})
+                        {% if payment.reference %}- Ref: {{ payment.reference }}{% endif %}
+                    </small><br>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endif %}
+            {% empty %}
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 2rem;">
+                    No outstanding debts! 
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
