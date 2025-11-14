@@ -5,7 +5,9 @@
 {% block content %}
 <div class="card" style="max-width: 800px; margin: 2rem auto;">
     <div style="text-align: center; margin-bottom: 2rem;">
-        <h1 style="color: #667eea;">SALES RECEIPT</h1>
+        <h1 style="color: #667eea;">A.A ASHIRU ENTERPRIISES SAKI</h1>
+        <h2 style="color: #667eea;">HOME OF QUALITY ENGINEERING KITS</h2>
+        <h2 style="color: #667eea;">SALES RECEIPT</h1>
         <p style="font-size: 1.2rem;"><strong>Invoice: {{ sale.invoice_number }}</strong></p>
     </div>
     
@@ -17,7 +19,7 @@
         </div>
         <div style="text-align: right;">
             <p><strong>Date:</strong> {{ sale.created_at|date:"M d, Y H:i" }}</p>
-            <p><strong>Served By:</strong> {{ sale.staff.first_name }} {{ sale.staff.last_name }}</p>
+            <p><strong>Served By:</strong> {{ sale.staff.first_name }}</p>
         </div>
     </div>
     
@@ -28,7 +30,6 @@
                 <th>Product</th>
                 <th>Price</th>
                 <th>Qty</th>
-                <th>Discount</th>
                 <th>Total</th>
             </tr>
         </thead>
@@ -39,7 +40,6 @@
                 <td>{{ item.product_name }}</td>
                 <td>₦{{ item.price|floatformat:2 }}</td>
                 <td>{{ item.quantity }}</td>
-                <td>₦{{ item.discount|floatformat:2 }}</td>
                 <td><strong>₦{{ item.total|floatformat:2 }}</strong></td>
             </tr>
             {% endfor %}
@@ -51,7 +51,9 @@
         <p style="font-size: 1.1rem;"><strong>Total Discount:</strong> ₦{{ sale.discount|floatformat:2 }}</p>
         <p style="font-size: 1.5rem; color: #667eea;"><strong>GRAND TOTAL:</strong> ₦{{ sale.total|floatformat:2 }}</p>
         <p style="font-size: 1.1rem;"><strong>Amount Paid:</strong> ₦{{ sale.amount_paid|floatformat:2 }}</p>
+        {% if sale.balance > 0 %}
         <p style="font-size: 1.1rem; color: #dc3545;"><strong>Balance:</strong> ₦{{ sale.balance|floatformat:2 }}</p>
+        {% endif %}
     </div>
     
     <div style="text-align: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px dashed #ccc;">
